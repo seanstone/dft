@@ -11,19 +11,18 @@ complex float InputData[DFT_SIZE];
 complex float OutputData[DFT_SIZE];
 void clear (void);
 void plot (complex float* data, size_t size, float scale, int height);
-void dft (complex float* in, complex float* out, size_t size);
+void dft (complex float* in, complex float* out, int size);
+void rdft (complex float* in, complex float* out, int size);
 
 int main (void)
 {
     clear();
 
     for (int x = 0; x < DFT_SIZE; x++)
-        InputData[x] =
-            cos((x-DFT_SIZE/2) * 5/8.);
-            //sin((x-DFT_SIZE/2) * 2/8.);
+        InputData[x] = cos((x-DFT_SIZE/2) * 5/8.);
 
     plot(InputData, DFT_SIZE, 4., 30);
-    dft(InputData, OutputData, DFT_SIZE);
+    rdft(InputData, OutputData, DFT_SIZE);
     plot(OutputData, DFT_SIZE, 0.25, 30);
 
     // for (int x = 0; x < DFT_SIZE; x++)
@@ -88,12 +87,25 @@ void plot (complex float* data, size_t size, float scale, int height)
     printf("\r\n");
 }
 
-void dft (complex float* in, complex float* out, size_t size)
+void dft (complex float* in, complex float* out, int size)
 {
     for (int k = 0; k < size; k++)
     {
         out[k] = 0;
         for (int x = 0; x < size; x++)
+            out[k] += in[x] * cexp(1i * 2 * M_PI * (k-size/2) * (x-size/2) / size);
+    }
+}
+
+void rdft (complex float* in, complex float* out, int size)
+{
+    for (int k = size/2; k < size; k++)
+    {
+        out[k] = 0;
+        for (int x = 0; x < size; x++)
             out[k] += in[x] * cexp(1i * 2 * M_PI * (k-DFT_SIZE/2) * (x-DFT_SIZE/2) / size);
     }
+
+    for (int k = 0; k < size/2; k++)
+        out[k] = out[size - k];
 }
